@@ -161,9 +161,6 @@ accel_data %>%
   ggplot(aes(x = hour, y = activity_counts, group = day_id, color = day)) + 
   scale_x_discrete(
     breaks = seq(60,1440,60))+
-  #   labels = as.character(c(1:24))) +
-  # geom_point(alpha = .3, size = 0.6) + 
-  # geom_line(alpha = .3, size = 0.4) +
   geom_point(alpha = .3, size = 1.6) + 
   geom_line(alpha = .3, size = 1.4) +
   geom_smooth(aes(group = day), se = FALSE)+
@@ -184,16 +181,29 @@ Based on this graph, we can see the individual has relatively small activity bet
 ```{r}
 library(p8105.datasets)
 data("ny_noaa")
-
-noaa_data=ny_noaa %>%
-  janitor::clean_names()
-# %>%
-#   seperate(date, into = c("year","month","day"),sep = "-")%>%
+ny_noaa
 ```
-
-
 The size of the dataset is `r dim(ny_noaa)`, there are `r nrow(ny_noaa)` observations of `ncol(ny_noaa)` variables, the variables include _id_, _prcp_, _snow_, _snwd_, _tmax_, _tmin_ and _date_. The type of variables include date, integer and character. Each row of the dataset contains the information about the weather in each station everyday. There are `r sum(is.na(ny_noaa$prcp))` missing values for precipitation, `r sum(is.na(ny_noaa$snow))` missing values for snowfall, `r sum(is.na(ny_noaa$snwd))` missing values for snow depth, `r sum(is.na(ny_noaa$tmax))` missing values for tmax, `r sum(is.na(ny_noaa$tmin))` missing values for tmin.
 
+```{r}
+noaa_data=ny_noaa %>%
+  janitor::clean_names()%>%
+  separate(date, into=c("year", "month", "day"), sep = "-")%>%
+  mutate(tmax=as.numeric(tmax),
+         tmin=as.numeric(tmin),
+         prcp=prcp/10
+         ) %>%
+  mutate(tmax=tmax/10,
+         tmin=tmin/10)
+
+```
+Observations for temperature, precipitation, and snowfall are set to reasonable units.
+
+```{r}
+mode(noaa_data$snow)
+```
+
+Use the _mode_ function in r, we find `r mode(noaa_data$snow)` is the most commonly observed value. This is probably due to snow is not common in New York for most of time.
 
 
 
