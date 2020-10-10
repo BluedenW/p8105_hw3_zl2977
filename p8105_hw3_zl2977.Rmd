@@ -9,7 +9,7 @@ output: github_document
 ```{r setup, include=FALSE}
 library(tidyverse)
 library(p8105.datasets)
-
+library(patchwork)
 # knitr::opts_chunk$set(
 # 	fig.width = 6, 
 #   fig.asp = .6,
@@ -18,7 +18,7 @@ library(p8105.datasets)
 
 knitr::opts_chunk$set(echo = TRUE,
   warning = FALSE,
-	fig.width = 10, 
+	fig.width = 12, 
   fig.height = 8,
   out.width = "90%")
 
@@ -233,7 +233,7 @@ first_plot=
     title = "tmax vs tmin for the full dataset",
     x="tmax",
     y="tmin")+
-  theme(plot.title = element_text(hjust = 0.5), legend.position = "bottom", legend.key.width = unit(1.2,"cm"))
+  theme(plot.title = element_text(hjust = 0.5),legend.position = "bottom", legend.key.width = unit(1.2,"cm"))
 
 
 second_plot=
