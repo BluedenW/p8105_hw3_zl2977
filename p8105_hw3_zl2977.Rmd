@@ -10,11 +10,17 @@ output: github_document
 library(tidyverse)
 library(p8105.datasets)
 
-knitr::opts_chunk$set(
-	fig.width = 6, 
-  fig.asp = .6,
-  out.width = "90%"
-)
+# knitr::opts_chunk$set(
+# 	fig.width = 6, 
+#   fig.asp = .6,
+#   out.width = "90%"
+# )
+
+knitr::opts_chunk$set(echo = TRUE,
+  warning = FALSE,
+	fig.width = 10, 
+  fig.height = 8,
+  out.width = "90%")
 
 theme_set(theme_minimal() + theme(legend.position = "bottom"))
 
@@ -153,20 +159,24 @@ accel_data%>%
 accel_data %>%
   mutate(hour=minute / 60)%>%
   ggplot(aes(x = hour, y = activity_counts, group = day_id, color = day)) + 
-  # scale_x_discrete(
-  #   breaks = seq(60,1440,60),
+  scale_x_discrete(
+    breaks = seq(60,1440,60))+
   #   labels = as.character(c(1:24))) +
-  geom_point(alpha = .3, size = 0.6) + 
-  geom_line(alpha = .3, size = 0.4) +
+  # geom_point(alpha = .3, size = 0.6) + 
+  # geom_line(alpha = .3, size = 0.4) +
+  geom_point(alpha = .3, size = 1.6) + 
+  geom_line(alpha = .3, size = 1.4) +
   geom_smooth(aes(group = day), se = FALSE)+
   labs(title = "24-hour activity time courses for each day ",
        caption = "Data from accel_data",
        x = "hour",
        y = "activity counts")+  
-  scale_x_continuous(breaks = seq(0,24,6), limits = c(0,24))+
+  scale_x_continuous(breaks = seq(0,24,2), limits = c(0,24))+
   theme(plot.title = element_text(hjust = 0.5))
 
 ```
+                    
+                    
 Based on this graph, we can see the individual has relatively small activity between midnight until 5am everyday, which probably due to sleep. One peak in activity counts is in the middle of the day on Sundays, this peak might due to go out and eat lunch at weekend. Other peaks in activity counts are in between 7pm to 10pm on Friday and Saturday, these might  due to the individual go out eat dinner or do some exercises. There exists a high activity count around 7pm to 8pm on Wednesday as well. It seems like the individual has more activities during weekend comparing with weekdays.
 
 ### Problem3
@@ -174,11 +184,15 @@ Based on this graph, we can see the individual has relatively small activity bet
 ```{r}
 library(p8105.datasets)
 data("ny_noaa")
-ny_noaa
+
+noaa_data=ny_noaa %>%
+  janitor::clean_names()
+# %>%
+#   seperate(date, into = c("year","month","day"),sep = "-")%>%
 ```
 
 
-The size of the dataset is
+The size of the dataset is `r dim(ny_noaa)`, there are `r nrow(ny_noaa)` observations of `ncol(ny_noaa)` variables, the variables include _id_, _prcp_, _snow_, _snwd_, _tmax_, _tmin_ and _date_. The type of variables include date, integer and character. Each row of the dataset contains the information about the weather in each station everyday. There are `r sum(is.na(ny_noaa$prcp))` missing values for precipitation, `r sum(is.na(ny_noaa$snow))` missing values for snowfall, `r sum(is.na(ny_noaa$snwd))` missing values for snow depth, `r sum(is.na(ny_noaa$tmax))` missing values for tmax, `r sum(is.na(ny_noaa$tmin))` missing values for tmin.
 
 
 
