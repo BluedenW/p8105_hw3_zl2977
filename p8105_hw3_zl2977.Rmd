@@ -200,6 +200,7 @@ noaa_data=ny_noaa %>%
 Observations for temperature, precipitation, and snowfall are set to reasonable units.
 
 ```{r}
+noaa_data
 mode(noaa_data$snow)
 ```
 
@@ -207,9 +208,6 @@ Use the _mode_ function in r, we find `r mode(noaa_data$snow)` is the most commo
 
 
 ```{r}
-noaa_data
-
-
 noaa_data %>%
   filter((month =="01"| month == "07") & !is.na(tmax)) %>%
   group_by(month, year, id)%>%
@@ -225,6 +223,39 @@ noaa_data %>%
   )
 ```
 We can see the average max temperature of July is higher comparing with January. There are some outliers in the plots, which indicate that there existed some abnormally high and low temperatures in January, and there also existed some abnormally low temperatures in July.
+
+
+```{r}
+first_plot=
+  noaa_data %>%
+  filter(!is.na(tmax) & !is.na(tmin)) %>%
+  ggplot(aes(x=tmax, y=tmin))+
+  geom_hex()+
+  labs(
+    title = "tmax vs tmin for the full dataset",
+    x="tmax",
+    y="tmin")+
+  theme(plot.title = element_text(hjust = 0.5), legend.position = "bottom", legend.key.width = unit(1.2,"cm"))
+
+
+second_plot=
+  noaa_data %>%
+  filter(snow>0 & snow<100)%>%
+  ggplot(aes(x =snow, color =year)) +
+  geom_density(alpha = .4, adjust =.5)+
+  labs(
+    title = "Distribution of snowfall values",
+    x = "Snowfall values",
+    y = "Density") +
+    theme(plot.title = element_text(hjust = 0.5), legend.position = "bottom", legend.key.width = unit(0.2, "cm"))
+
+  
+first_plot+second_plot   
+
+
+```
+
+From the hex plot, we found the largest counts are in area covered by (-15,30) of tmin and (-10, 30) of tmax. In the distribution of snowfall values, we observed that the most snowfall appears is 25mm while the least is 100mm. Although there are fluctuations, the trend is mainly decreasing from 0mm to 100mm. In the 0-15 mm range, there are significant differences snowfall values between years.
 
 
 
