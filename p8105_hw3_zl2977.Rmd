@@ -87,7 +87,6 @@ instacart %>%
 Let's make a table!!
 
 ```{r}
-instacart
 instacart %>% 
 	filter(aisle %in% c("baking ingredients", "dog food care", "packaged vegetables fruits")) %>% 
 	group_by(aisle) %>% 
@@ -129,23 +128,57 @@ accel_data=
   mutate(
     minute=as.numeric(minute),
     day=factor(day),
-    day=fct_relevel(day,"Sunday","Monday",)
+    day=fct_relevel(day,"Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"),
+    weekday_or_weekend=ifelse(day %in% c("Saturday","Sunday"),"weekend","weekday")
+  )%>%
+  arrange(week,day)
+
+```
+After tidying the dataset, our original dataset has become a `r dim(accel_data)` dataset, which contains `r nrow(accel_data)` observations of `r ncol(accel_data)` variables, each row records the information of that single minute in the five weeks. The variables include _week_, _day_id_, _day_, _minute_, _activity_counts_ and _weekday_or_weekend_. The data has been arranged by day of the the week from Sunday to Saturday.
+
+
+```{r}
+accel_data%>%
+  group_by(week,day) %>%
+  summarize(
+    total_activity=sum(activity_counts)
+  ) %>%
+  pivot_wider(
+    names_from = day,
+    values_from=total_activity
   )
-# accel_data    
-#     ,
-#     weekday_vs_weekend=ifelse(day %in% c("Saturday","Sunday"),"Weekend","Weekday"))
 
+```
+```{r}
+accel_data %>%
+  mutate(hour=minute / 60)%>%
+  ggplot(aes(x = hour, y = activity_counts, group = day_id, color = day)) + 
+  # scale_x_discrete(
+  #   breaks = seq(60,1440,60),
+  #   labels = as.character(c(1:24))) +
+  geom_point(alpha = .3, size = 0.6) + 
+  geom_line(alpha = .3, size = 0.4) +
+  geom_smooth(aes(group = day), se = FALSE)+
+  labs(title = "24-hour activity time courses for each day ",
+       caption = "Data from accel_data",
+       x = "hour",
+       y = "activity counts")+  
+  scale_x_continuous(breaks = seq(0,24,6), limits = c(0,24))+
+  theme(plot.title = element_text(hjust = 0.5))
 
+```
+Based on this graph, we can see the individual has relatively small activity between midnight until 5am everyday, which probably due to sleep. One peak in activity counts is in the middle of the day on Sundays, this peak might due to go out and eat lunch at weekend. Other peaks in activity counts are in between 7pm to 10pm on Friday and Saturday, these might  due to the individual go out eat dinner or do some exercises. There exists a high activity count around 7pm to 8pm on Wednesday as well. It seems like the individual has more activities during weekend comparing with weekdays.
 
+### Problem3
 
-# library(xlsx)
-# write.xlsx(accel_data, "./mydata.xlsx")
+```{r}
+library(p8105.datasets)
+data("ny_noaa")
+ny_noaa
 ```
 
 
-
-
-
+The size of the dataset is
 
 
 
