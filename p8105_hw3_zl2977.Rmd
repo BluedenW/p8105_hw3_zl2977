@@ -74,8 +74,6 @@ instacart %>%
 
 Let's make a plot
 
-
-
 ```{r}
 instacart %>% 
 	count(aisle) %>% 
@@ -241,8 +239,8 @@ first_plot=
 second_plot=
   noaa_data %>%
   filter(snow>0 & snow<100)%>%
-  ggplot(aes(x =snow, color =year)) +
-  geom_density(alpha = .4, adjust =.5)+
+  ggplot(aes(x=snow, color=year)) +
+  geom_density(alpha = .5, adjust =.6)+
   labs(
     title = "Distribution of snowfall values",
     x = "Snowfall values",
@@ -255,7 +253,7 @@ first_plot+second_plot
 
 ```
 
-From the hex plot, we found the largest counts are in area covered by (-15,30) of tmin and (-10, 30) of tmax. In the distribution of snowfall values, we observed that the most snowfall appears is 25mm while the least is 100mm. Although there are fluctuations, the trend is mainly decreasing from 0mm to 100mm. In the 0-15 mm range, there are significant differences snowfall values between years.
+From the hex plot, we found the largest counts are in area covered by (-15,30) of tmin and (-10, 30) of tmax. In the distribution of snowfall values, we observed that the most snowfall appears is 25mm while the least is 100mm. Although there are fluctuations, the trend is mainly decreasing from 0mm to 100mm. In the 0-15 mm range, there are significant differences of snowfall values between years.
 
 
 
