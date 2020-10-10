@@ -1,7 +1,7 @@
 ---
 title: "Homework 3 solutions"
 author: "Zhourong Li zl2977"
-date: '`r format(Sys.time(), "%Y-%m-%d")`'
+date: "2020/10/10"
 output: github_document
 ---
 
@@ -10,15 +10,10 @@ output: github_document
 library(tidyverse)
 library(p8105.datasets)
 library(patchwork)
-# knitr::opts_chunk$set(
-# 	fig.width = 6, 
-#   fig.asp = .6,
-#   out.width = "90%"
-# )
 
 knitr::opts_chunk$set(echo = TRUE,
   warning = FALSE,
-	fig.width = 12, 
+	fig.width = 12,
   fig.height = 8,
   out.width = "90%")
 
@@ -70,8 +65,7 @@ instacart %>%
 	count(aisle) %>% 
 	arrange(desc(n))
 ```
-
-
+     
 Let's make a plot
 
 ```{r}
@@ -88,7 +82,7 @@ instacart %>%
 ```
 
 
-Let's make a table!!
+Let's make a table.
 
 ```{r}
 instacart %>% 
@@ -117,6 +111,9 @@ instacart %>%
 
 ### Problem2
 
+The following code imported the data from the csv file, tidied the dataset and converted the dataset from wide to long. The following code also changed the type of `minute` from character to numeric, converted `day` to a factor.
+
+     
 ```{r,warning=FALSE,message=FALSE}
 accel_data=
  read_csv(
@@ -136,23 +133,25 @@ accel_data=
     weekday_or_weekend=ifelse(day %in% c("Saturday","Sunday"),"weekend","weekday")
   )%>%
   arrange(week,day)
-
 ```
-After tidying the dataset, our original dataset has become a `r dim(accel_data)` dataset, which contains `r nrow(accel_data)` observations of `r ncol(accel_data)` variables, each row records the information of that single minute in the five weeks. The variables include _week_, _day_id_, _day_, _minute_, _activity_counts_ and _weekday_or_weekend_. The data has been arranged by day of the the week from Sunday to Saturday.
+After tidying the dataset, our original dataset has the size of (`r dim(accel_data)`) , which contains `r nrow(accel_data)` observations of `r ncol(accel_data)` variables, each row records the information of that single minute in the five weeks. The variables include _week_, _day_id_, _day_, _minute_, _activity_counts_ and _weekday_or_weekend_. Key variables are _minute_ and _activity_counts_. The data has been arranged by day of the the week from Sunday to Saturday.
 
 
 ```{r}
 accel_data%>%
-  group_by(week,day) %>%
+  group_by(day,week) %>%
   summarize(
     total_activity=sum(activity_counts)
   ) %>%
   pivot_wider(
     names_from = day,
     values_from=total_activity
-  )
+  ) %>%
+  knitr::kable(align = 'c')
 
 ```
+There are no clear trends being shown in this table. The  `total_activity` of each day is fluctuated. There exist two unusually small `total_activity` over two Saturdays in week 4 and 5. The count 1440 indicates the accelerometer records 1 activity during 1 minute, might due to default setting or by mistake.
+
 ```{r}
 accel_data %>%
   mutate(hour=minute / 60)%>%
@@ -172,16 +171,15 @@ accel_data %>%
 ```
                     
                     
-Based on this graph, we can see the individual has relatively small activity between midnight until 5am everyday, which probably due to sleep. One peak in activity counts is in the middle of the day on Sundays, this peak might due to go out and eat lunch at weekend. Other peaks in activity counts are in between 7pm to 10pm on Friday and Saturday, these might  due to the individual go out eat dinner or do some exercises. There exists a high activity count around 7pm to 8pm on Wednesday as well. It seems like the individual has more activities during weekend comparing with weekdays.
+Based on this graph, we can see the individual has relatively small activity between midnight until 5am everyday, which probably due to sleep. One peak in activity counts is in the middle of the day on Sundays, this peak might be caused by going out for lunch at weekends. Other peaks in activity counts are in between 7pm to 10pm on Friday and Saturday, might due to the individual go out eat dinner or do some exercises.
 
 ### Problem3
 
 ```{r}
 library(p8105.datasets)
 data("ny_noaa")
-
 ```
-The size of the dataset is `r dim(ny_noaa)`, there are `r nrow(ny_noaa)` observations of `ncol(ny_noaa)` variables, the variables include _id_, _prcp_, _snow_, _snwd_, _tmax_, _tmin_ and _date_. The type of variables include date, integer and character. Each row of the dataset contains the information about the weather in each station everyday. There are `r sum(is.na(ny_noaa$prcp))` missing values for precipitation, `r sum(is.na(ny_noaa$snow))` missing values for snowfall, `r sum(is.na(ny_noaa$snwd))` missing values for snow depth, `r sum(is.na(ny_noaa$tmax))` missing values for tmax, `r sum(is.na(ny_noaa$tmin))` missing values for tmin.
+The size of the dataset is (`r dim(ny_noaa)`), there are `r nrow(ny_noaa)` observations of `r ncol(ny_noaa)` variables, the variables include _id_, _prcp_, _snow_, _snwd_, _tmax_, _tmin_ and _date_. The types of variables include date, integer and character. Each row of the dataset contains the information about the weather in each station everyday. There are `r sum(is.na(ny_noaa$prcp))` missing values for `precipitation`, `r sum(is.na(ny_noaa$snow))` missing values for `snowfall`, `r sum(is.na(ny_noaa$snwd))` missing values for `snow depth`, `r sum(is.na(ny_noaa$tmax))` missing values for `tmax`, `r sum(is.na(ny_noaa$tmin))` missing values for `tmin.`
 
 ```{r}
 noaa_data=ny_noaa %>%
@@ -195,14 +193,19 @@ noaa_data=ny_noaa %>%
          tmin=tmin/10)
 
 ```
-Observations for temperature, precipitation, and snowfall are set to reasonable units.
+We changed units for maximum and minimum temperature from tenth of degree C to degree C and precipitation, from tenth of mm to mm.
 
 ```{r}
-noaa_data
-mode(noaa_data$snow)
+getmode <- function(v) {
+   uniqv <- unique(v)
+   uniqv[which.max(tabulate(match(v, uniqv)))]
+}
+getmode(noaa_data$snow)
+
+
 ```
 
-Use the _mode_ function in r, we find `r mode(noaa_data$snow)` is the most commonly observed value. This is probably due to snow is not common in New York for most of time.
+We find `r getmode(noaa_data$snow)` is the most commonly observed value. This is probably due to snow is not common in New York for most of time.
 
 
 ```{r}
@@ -220,6 +223,8 @@ noaa_data %>%
     y="Average temperature"
   )
 ```
+     
+       
 We can see the average max temperature of July is higher comparing with January. There are some outliers in the plots, which indicate that there existed some abnormally high and low temperatures in January, and there also existed some abnormally low temperatures in July.
 
 
@@ -253,7 +258,7 @@ first_plot+second_plot
 
 ```
 
-From the hex plot, we found the largest counts are in area covered by (-15,30) of tmin and (-10, 30) of tmax. In the distribution of snowfall values, we observed that the most snowfall appears is 25mm while the least is 100mm. Although there are fluctuations, the trend is mainly decreasing from 0mm to 100mm. In the 0-15 mm range, there are significant differences of snowfall values between years.
+From the hex plot, we found the largest counts are in area covered by (-15,30) of tmin and (-10, 40) of tmax. In the distribution of snowfall values, we observed that the most snowfall appears is 25mm while the least is 100mm. Although there are fluctuations, the trend is mainly decreasing from 0mm to 100mm. In the 0-15 mm range, there are significant differences of snowfall values between years.
 
 
 
