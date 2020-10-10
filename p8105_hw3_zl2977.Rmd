@@ -181,7 +181,7 @@ Based on this graph, we can see the individual has relatively small activity bet
 ```{r}
 library(p8105.datasets)
 data("ny_noaa")
-ny_noaa
+
 ```
 The size of the dataset is `r dim(ny_noaa)`, there are `r nrow(ny_noaa)` observations of `ncol(ny_noaa)` variables, the variables include _id_, _prcp_, _snow_, _snwd_, _tmax_, _tmin_ and _date_. The type of variables include date, integer and character. Each row of the dataset contains the information about the weather in each station everyday. There are `r sum(is.na(ny_noaa$prcp))` missing values for precipitation, `r sum(is.na(ny_noaa$snow))` missing values for snowfall, `r sum(is.na(ny_noaa$snwd))` missing values for snow depth, `r sum(is.na(ny_noaa$tmax))` missing values for tmax, `r sum(is.na(ny_noaa$tmin))` missing values for tmin.
 
@@ -206,8 +206,25 @@ mode(noaa_data$snow)
 Use the _mode_ function in r, we find `r mode(noaa_data$snow)` is the most commonly observed value. This is probably due to snow is not common in New York for most of time.
 
 
+```{r}
+noaa_data
 
 
+noaa_data %>%
+  filter((month =="01"| month == "07") & !is.na(tmax)) %>%
+  group_by(month, year, id)%>%
+  summarize(average_temp=mean(tmax))%>%
+  ggplot(aes(x = year, y = average_temp))+
+  geom_boxplot()+
+  facet_grid(.~month)+
+  theme(axis.text.x=element_text(angle = 90, hjust =1),plot.title = element_text(hjust = 0.5)) +
+  labs(
+    title = "Average max temperature in January and in July in each station across years",
+    x="Year",
+    y="Average temperature"
+  )
+```
+We can see the average max temperature of July is higher comparing with January. There are some outliers in the plots, which indicate that there existed some abnormally high and low temperatures in January, and there also existed some abnormally low temperatures in July.
 
 
 
